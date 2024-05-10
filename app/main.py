@@ -17,7 +17,7 @@ def handle_request(client_socket: socket.socket) -> None:
     http_version = request_arr[2]
 
     if method.lower() == "get" and path.lower() == "/":
-        client_socket.send(f"SUCCESS_RESPONSE{CRLF}{CRLF}".encode())
+        client_socket.send(f"{SUCCESS_RESPONSE}{CRLF}{CRLF}".encode())
     elif method.lower() == "get" and "/echo/" in path.lower():
         param = path.split("/")[-1]
         response = f"{SUCCESS_RESPONSE}{CRLF}Content-Type: text/plain{CRLF}Content-Length: {len(param)}{CRLF}{CRLF}{param}"
