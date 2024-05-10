@@ -11,7 +11,7 @@ def handle_request(client_socket: socket.socket) -> None:
     request = client_socket.recv(1024).decode()
 
     request_arr = request.split(" ")
-    print(request_arr)
+
     method = request_arr[0]
     path = request_arr[1]
     http_version = request_arr[2]
@@ -21,6 +21,10 @@ def handle_request(client_socket: socket.socket) -> None:
     elif method.lower() == "get" and "/echo/" in path.lower():
         param = path.split("/")[-1]
         response = f"{SUCCESS_RESPONSE}{CRLF}Content-Type: text/plain{CRLF}Content-Length: {len(param)}{CRLF}{CRLF}{param}"
+        client_socket.send(response.encode())
+    elif method.lower() == "get" and "/user-agent" in path.lower():
+        user_agent = request_arr[-1].replace(CRLF, "")
+        response = f"{SUCCESS_RESPONSE}{CRLF}Content-Type: text/plain{CRLF}Content-Length:{len(user_agent)}{CRLF}{CRLF}{user_agent}"
         client_socket.send(response.encode())
     else:
         client_socket.send(f"{NOT_FOUND_RESPONSE}{CRLF}{CRLF}".encode())
