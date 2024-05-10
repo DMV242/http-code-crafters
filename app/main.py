@@ -12,7 +12,7 @@ def handle_request(client_socket: socket.socket) -> None:
     path = request_arr[1]
     http_version = request_arr[2]
 
-    if method.lower() == "get" and path.lower() == "/index.html":
+    if method.lower() == "get" and path.lower() == "/":
         client_socket.send(SUCCESS_RESPONSE.encode())
     else:
         client_socket.send(NOT_FOUND_RESPONSE.encode())
