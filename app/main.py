@@ -23,7 +23,7 @@ def handle_request(client_socket: socket.socket) -> None:
         response = f"{SUCCESS_RESPONSE}{CRLF}Content-Type: text/plain{CRLF}Content-Length: {len(param)}{CRLF}{CRLF}{param}"
         client_socket.send(response.encode())
     else:
-        client_socket.send(f"NOT_FOUND_RESPONSE{CRLF}{CRLF}".encode())
+        client_socket.send(f"{NOT_FOUND_RESPONSE}{CRLF}{CRLF}".encode())
     client_socket.close()
 
 
