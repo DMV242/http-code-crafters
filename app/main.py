@@ -6,11 +6,13 @@ import sys
 FLAG_ARRAY = ["--directory"]
 CRLF = "\r\n"
 SUCCESS_RESPONSE = "HTTP/1.1 200 OK"
+CREATED_RESPONSE = "HTTP/1.1 201 OK"
 NOT_FOUND_RESPONSE = "HTTP/1.1 404 Not Found"
+SERVER_ERROR_RESPONSE = "HTTP/1.1 500 Server Error"
 
 
 def format_response(
-    body: str = "", not_found: bool = False, is_file: bool = False
+    body: str = "", not_found: bool = False, is_file: bool = False, new_file=False
 ) -> bytes:
     """
     This function formats response will be send to client after handling request
@@ -25,6 +27,9 @@ def format_response(
             res = f"{SUCCESS_RESPONSE}{CRLF}Content-Type: application/octet-stream{CRLF}Content-Length: {len(body)}{CRLF}{CRLF}{body}"
     if body == "" and not not_found:
         res = f"{SUCCESS_RESPONSE}{CRLF}{CRLF}"
+    if new_file == True:
+        res = f"{CREATED_RESPONSE}{CRLF}{CRLF}"
+    print(res)
     return res.encode()
 
 
@@ -47,7 +52,20 @@ def handle_request(client_socket: socket.socket, args: list[str]) -> None:
     method = request_arr[0]
     path = request_arr[1]
 
-    if directory != "":
+    if method.lower() == "post" and directory != "":
+        body = request.split("\r\n\r\n")[-1]
+        file_path = os.path.join(
+            os.path.dirname(__file__), directory, path.split("/")[-1]
+        )
+        try:
+            file = open(file_path, "w")
+            res = file.write(body)
+            file.close()
+            client_socket.send(format_response(new_file=True))
+        except:
+            client_socket.send(f"{SERVER_ERROR_RESPONSE}{CRLF}{CRLF}".encode())
+
+    elif method.lower() == "get" and directory != "":
         file_path = os.path.join(
             os.path.dirname(__file__), directory, path.split("/")[-1]
         )
@@ -57,7 +75,7 @@ def handle_request(client_socket: socket.socket, args: list[str]) -> None:
             client_socket.send(format_response(body=res, is_file=True))
         except:
             client_socket.send(format_response(not_found=True))
-    if method.lower() == "get" and path.lower() == "/":
+    elif method.lower() == "get" and path.lower() == "/":
         client_socket.send(format_response())
     elif method.lower() == "get" and "/echo/" in path.lower():
         param = path.split("/")[-1]
