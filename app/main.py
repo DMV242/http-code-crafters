@@ -59,6 +59,7 @@ def handle_request(client_socket: socket.socket, args: list[str]) -> None:
     path = request_arr[1]
 
     if method.lower() == "post" and directory != "":
+
         body = request.split("\r\n\r\n")[-1]
         file_path = os.path.join(
             os.path.dirname(__file__), directory, path.split("/")[-1]
@@ -71,7 +72,7 @@ def handle_request(client_socket: socket.socket, args: list[str]) -> None:
         except:
             client_socket.send(f"{SERVER_ERROR_RESPONSE}{CRLF}{CRLF}".encode())
 
-    elif method.lower() == "get" and directory != "":
+    elif method.lower() == "get" and directory != "" and "files" in path:
         file_path = os.path.join(
             os.path.dirname(__file__), directory, path.split("/")[-1]
         )
@@ -82,6 +83,7 @@ def handle_request(client_socket: socket.socket, args: list[str]) -> None:
         except:
             client_socket.send(format_response(not_found=True))
     elif method.lower() == "get" and path.lower() == "/":
+
         client_socket.send(format_response())
     elif method.lower() == "get" and "/echo/" in path.lower():
 
@@ -93,6 +95,7 @@ def handle_request(client_socket: socket.socket, args: list[str]) -> None:
         else:
             client_socket.send(format_response(body=param))
     elif method.lower() == "get" and "/user-agent" in path.lower():
+
         user_agent = request_arr[-1].replace(CRLF, "")
         client_socket.send(format_response(body=user_agent))
     else:
