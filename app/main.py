@@ -1,36 +1,62 @@
+import os
 import socket
+import sys
 
+
+FLAG_ARRAY = ["--directory"]
 CRLF = "\r\n"
 SUCCESS_RESPONSE = "HTTP/1.1 200 OK"
 NOT_FOUND_RESPONSE = "HTTP/1.1 404 Not Found"
 
 
-def format_response(body: str = "", not_found: bool = False) -> bytes:
+def format_response(
+    body: str = "", not_found: bool = False, is_file: bool = False
+) -> bytes:
     """
     This function formats response will be send to client after handling request
     """
     res = ""
-
-    if body != "" and not_found == False:
-        res = f"{SUCCESS_RESPONSE}{CRLF}Content-Type: text/plain{CRLF}Content-Length: {len(body)}{CRLF}{CRLF}{body}"
     if not_found == True:
         res = f"{NOT_FOUND_RESPONSE}{CRLF}{CRLF}"
+    if body != "" and not not_found:
+        if not is_file:
+            res = f"{SUCCESS_RESPONSE}{CRLF}Content-Type: text/plain{CRLF}Content-Length: {len(body)}{CRLF}{CRLF}{body}"
+        else:
+            res = f"{SUCCESS_RESPONSE}{CRLF}Content-Type: application/octet-stream{CRLF}Content-Length: {len(body)}{CRLF}{CRLF}{body}"
     if body == "" and not not_found:
         res = f"{SUCCESS_RESPONSE}{CRLF}{CRLF}"
     return res.encode()
 
 
-def handle_request(client_socket: socket.socket) -> None:
+def handle_request(client_socket: socket.socket, args: list[str]) -> None:
     """
     This function accepts socket as paramater and analyze socket to know
     what response will be send to client .
     It's return None
     """
+    directory = ""
+    flag = ""
+    if len(args) >= 3:
+        flag = args[1]
+        directory = args[2]
+    if flag != "" and flag not in FLAG_ARRAY:
+        client_socket.send(format_response(not_found=True))
+
     request = client_socket.recv(1024).decode()
     request_arr = request.split(" ")
     method = request_arr[0]
     path = request_arr[1]
 
+    if directory != "":
+        file_path = os.path.join(
+            os.path.dirname(__file__), directory, path.split("/")[-1]
+        )
+        try:
+            file = open(file_path, "r")
+            res = file.read()
+            client_socket.send(format_response(body=res, is_file=True))
+        except:
+            client_socket.send(format_response(not_found=True))
     if method.lower() == "get" and path.lower() == "/":
         client_socket.send(format_response())
     elif method.lower() == "get" and "/echo/" in path.lower():
@@ -44,24 +70,24 @@ def handle_request(client_socket: socket.socket) -> None:
     client_socket.close()
 
 
-def main():
+def main(args):
 
-    print("Logs from your program will appear here!")
     server_socket = socket.create_server(("localhost", 4221), reuse_port=False)
     print("server is listening on 4221")
 
-    while True:
-        try:
+    try:
+        while True:
             client_socket, _ = server_socket.accept()
-            handle_request(client_socket)
+            handle_request(client_socket, args)
             continue
-        except TimeoutError:
-            print("connection take too time ...")
-            continue
-        except KeyboardInterrupt:
-            print("server shutodown ...")
-            exit(0)
+    except TimeoutError:
+        print("connection take too time ...")
+
+    except KeyboardInterrupt:
+        print("server shutodown ...")
+        exit(0)
 
 
 if __name__ == "__main__":
-    main()
+
+    main(sys.argv)
