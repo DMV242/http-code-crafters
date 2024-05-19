@@ -35,7 +35,7 @@ def format_response(
                 res = f"{SUCCESS_RESPONSE}{CRLF}Content-Type: application/octet-stream{CRLF}Content-Length: {len(body)}{CRLF}{CRLF}{body}"
             else:
                 res = f"{SUCCESS_RESPONSE}{CRLF}Content-Encoding: gzip{CRLF}Content-Type: application/octet-stream{CRLF}Content-Length: {len(body)}{CRLF}{CRLF}{body}"
-    elif body == "" and not not_found:
+    elif body == "" and not not_found and not new_file:
         res = f"{SUCCESS_RESPONSE}{CRLF}{CRLF}"
     elif new_file == True:
         res = f"{CREATED_RESPONSE}{CRLF}{CRLF}"
@@ -62,7 +62,6 @@ def handle_request(client_socket: socket.socket, args: list[str]) -> None:
     path = request_arr[1]
 
     if method.lower() == "post" and directory != "":
-
         body = request.split("\r\n\r\n")[-1]
         file_path = os.path.join(
             os.path.dirname(__file__), directory, path.split("/")[-1]
