@@ -30,12 +30,12 @@ def format_response(
             if not accept_encoding:
                 res = f"{SUCCESS_RESPONSE}{CRLF}Content-Type: text/plain{CRLF}Content-Length: {len(body)}{CRLF}{CRLF}{body}"
             else:
-                res = f"{SUCCESS_RESPONSE}{CRLF}Content-Encoding: gzip{CRLF}Content-Type: text/plain{CRLF}Content-Length: {len(body)}{CRLF}{CRLF}{body}"
+                res = f"{SUCCESS_RESPONSE}{CRLF}Content-Encoding: gzip{CRLF}Content-Type: text/plain{CRLF}Content-Length: {len(body)}{CRLF}{CRLF}{gzip.compress(body.encode())}"
         else:
             if not accept_encoding:
                 res = f"{SUCCESS_RESPONSE}{CRLF}Content-Type: application/octet-stream{CRLF}Content-Length: {len(body)}{CRLF}{CRLF}{body}"
             else:
-                res = f"{SUCCESS_RESPONSE}{CRLF}Content-Encoding: gzip{CRLF}Content-Type: application/octet-stream{CRLF}Content-Length: {len(body)}{CRLF}{CRLF}{body}"
+                res = f"{SUCCESS_RESPONSE}{CRLF}Content-Encoding: gzip{CRLF}Content-Type: application/octet-stream{CRLF}Content-Length: {len(body)}{CRLF}{CRLF}{gzip.compress(body.encode())}"
     elif body == "" and not not_found and not new_file:
         res = f"{SUCCESS_RESPONSE}{CRLF}{CRLF}"
     elif new_file == True:
@@ -89,9 +89,9 @@ def handle_request(client_socket: socket.socket, args: list[str]) -> None:
         client_socket.send(format_response())
     elif method.lower() == "get" and "/echo/" in path.lower():
         param = path.split("/")[-1]
-        print(path)
+        decode_string = path.split("/")[-1]
         encoding = request_arr
-        print(encoding)
+
         if "gzip," in request_arr or "gzip\r\n\r\n" in request_arr:
             if "encoding-1," in request_arr or "encoding-2\r\n\r\n" in request_arr:
 
