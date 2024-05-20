@@ -1,6 +1,7 @@
 import os
 import socket
 import sys
+import gzip
 
 
 FLAG_ARRAY = ["--directory"]
@@ -88,6 +89,7 @@ def handle_request(client_socket: socket.socket, args: list[str]) -> None:
         client_socket.send(format_response())
     elif method.lower() == "get" and "/echo/" in path.lower():
         param = path.split("/")[-1]
+        print(path)
         encoding = request_arr
         print(encoding)
         if "gzip," in request_arr or "gzip\r\n\r\n" in request_arr:
