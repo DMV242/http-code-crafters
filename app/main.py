@@ -32,7 +32,7 @@ def format_response(
             else:
                 body = gzip.compress(body.encode())
                 res = (
-                    f"{SUCCESS_RESPONSE}{CRLF}Content-Encoding: gzip{CRLF}Content-Type: text/plain{CRLF}Content-Length: {len()}{CRLF}{CRLF}".encode()
+                    f"{SUCCESS_RESPONSE}{CRLF}Content-Encoding: gzip{CRLF}Content-Type: text/plain{CRLF}Content-Length: {len(body)}{CRLF}{CRLF}".encode()
                     + body
                 )
                 return res
