@@ -33,6 +33,7 @@ def format_response(
                 res = f"{SUCCESS_RESPONSE}{CRLF}Content-Encoding: gzip{CRLF}Content-Type: text/plain{CRLF}Content-Length: {len(body)}{CRLF}{CRLF}".encode() + gzip.compress(
                     body.encode()
                 )
+                print(f"res {res}")
                 return res
         else:
             if not accept_encoding:
@@ -41,6 +42,7 @@ def format_response(
                 res = f"{SUCCESS_RESPONSE}{CRLF}Content-Encoding: gzip{CRLF}Content-Type: application/octet-stream{CRLF}Content-Length: {len(body)}{CRLF}{CRLF}".encode() + gzip.compress(
                     body.encode()
                 )
+                return res
     elif body == "" and not not_found and not new_file:
         res = f"{SUCCESS_RESPONSE}{CRLF}{CRLF}"
     elif new_file == True:
