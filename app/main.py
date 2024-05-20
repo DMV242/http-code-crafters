@@ -97,7 +97,7 @@ def handle_request(client_socket: socket.socket, args: list[str]) -> None:
             else:
                 client_socket.send(format_response(body=param, accept_encoding=True))
         else:
-            print(2)
+
             client_socket.send(format_response(body=param))
     elif method.lower() == "get" and "/user-agent" in path.lower():
         user_agent = request_arr[-1].replace(CRLF, "")
