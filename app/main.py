@@ -89,7 +89,7 @@ def handle_request(client_socket: socket.socket, args: list[str]) -> None:
     elif method.lower() == "get" and "/echo/" in path.lower():
         param = path.split("/")[-1]
         encoding = request_arr[-1].split("\r\n\r\n")[0].lower()
-        if encoding == "gzip":
+        if "gzip" in encoding:
             client_socket.send(format_response(body=param, accept_encoding=True))
         else:
             client_socket.send(format_response(body=param))
@@ -122,3 +122,6 @@ def main(args):
 if __name__ == "__main__":
 
     main(sys.argv)
+
+
+# CODE BY MMEDV242
