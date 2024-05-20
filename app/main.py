@@ -96,14 +96,17 @@ def handle_request(client_socket: socket.socket, args: list[str]) -> None:
     elif method.lower() == "get" and "/echo/" in path.lower():
         param = path.split("/")[-1]
         decode_string = path.split("/")[-1]
-        encoding = request_arr
 
         if "gzip," in request_arr or "gzip\r\n\r\n" in request_arr:
             if "encoding-1," in request_arr or "encoding-2\r\n\r\n" in request_arr:
 
-                client_socket.send(format_response(body=param, accept_encoding=True))
+                client_socket.send(
+                    format_response(body=decode_string, accept_encoding=True)
+                )
             else:
-                client_socket.send(format_response(body=param, accept_encoding=True))
+                client_socket.send(
+                    format_response(body=decode_string, accept_encoding=True)
+                )
         else:
 
             client_socket.send(format_response(body=param))
